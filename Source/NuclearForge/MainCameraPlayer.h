@@ -16,6 +16,7 @@ public:
 	void MovementForward(float AxisValue);
 	void MovementSide(float AxisValue);
 	void IncreseSpeed(float value);
+	void MoveUpDown(float value);
 	void PlaceObject();
 	void ChagneGhost(UClass* ghost);
 	UPROPERTY(EditAnywhere, Category = "GhostMESH");
@@ -24,6 +25,8 @@ public:
 	UMaterialInterface* CannotBeBuiltMaterial;
 	UPROPERTY(EditAnywhere);
 	float Speed=100;
+	UPROPERTY(EditAnywhere);
+	float UpDownSpeed = 50;
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UPROPERTY(EditAnywhere, Category = "Testing")
 	TSubclassOf<AActor> ActorToSpawn;

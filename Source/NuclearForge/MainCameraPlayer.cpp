@@ -23,8 +23,8 @@ void AMainCameraPlayer::ChagneGhost(UClass* ghost) {
 	{
 		GetWorld()->DestroyActor(Ghost);
 	}
-	FActorSpawnParameters fasp;
-Ghost= GetWorld()->SpawnActor<AActor>(ghost,FVector::Zero(), FRotator::ZeroRotator, fasp);
+//FActorSpawnParameters fasp;
+Ghost= GetWorld()->SpawnActor<AActor>(ghost,FVector::Zero(), FRotator::ZeroRotator);
 GhostMesh = Ghost->GetComponentByClass<UStaticMeshComponent>();
 GhostMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
@@ -86,6 +86,10 @@ void AMainCameraPlayer::IncreseSpeed(float value)
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 
 }
+void AMainCameraPlayer::MoveUpDown(float value)
+{
+SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z+(value*AMainCameraPlayer::UpDownSpeed)));
+}
 #pragma endregion
 void AMainCameraPlayer::PlaceObject()
 {
@@ -102,6 +106,9 @@ void AMainCameraPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMainCameraPlayer::MovementForward);
 	PlayerInputComponent->BindAxis("MoveSide", this, &AMainCameraPlayer::MovementSide);
 	PlayerInputComponent->BindAxis("IncreseSpeed",this, &AMainCameraPlayer::IncreseSpeed);
+	PlayerInputComponent->BindAxis("MoveUpDown",this, &AMainCameraPlayer::MoveUpDown);
+
+	//Actions
 	PlayerInputComponent->BindAction("PlaceObject",IE_Pressed,this, &AMainCameraPlayer::PlaceObject);
 
 
