@@ -45,12 +45,14 @@ public:
 	/// This is grid size of blocks snapping
 	/// </summary>
 	float GridSize = 100;
-	
+
+	UPROPERTY(EditAnywhere, Category = "Blocks")
+	uint32 BlockID=0;
 	UPROPERTY(EditAnywhere, Category = "Blocks")
 	/// <summary>
 	/// This is Actor That represents blocks.
 	/// </summary>
-	TSubclassOf<AActor> ActorToSpawn;
+	TArray<TSubclassOf<AActor>> Blocks;
 	
 	UPROPERTY(EditAnywhere, Category = "Blocks ghosts")
 	/// <summary>
