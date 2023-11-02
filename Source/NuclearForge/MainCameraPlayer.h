@@ -30,8 +30,10 @@ public:
 	UPROPERTY(EditAnywhere);
 	float UpDownSpeed = 50;
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UPROPERTY(EditAnywhere, Category = "Testing")
+	UPROPERTY(EditAnywhere, Category = "Blocks")
 	TSubclassOf<AActor> ActorToSpawn;
+	UPROPERTY(EditAnywhere, Category = "Blocks ghosts")
+	TSubclassOf<AActor> GhostToSpawn;
 	FHitResult HitResult;
 	FVector SurfacePoint;
 protected:

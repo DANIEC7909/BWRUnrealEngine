@@ -19,7 +19,7 @@ void AMainCameraPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	cachedSpeed = Speed;
-	ChagneGhost(ActorToSpawn);
+	ChagneGhost(GhostToSpawn);
 GameMode =CastChecked<ANuclearForgeGameMode>( UGameplayStatics::GetGameMode(GetWorld()));
 GameMode->Player = this;
 	 PlayerController = GetWorld()->GetFirstPlayerController();
@@ -36,7 +36,10 @@ void AMainCameraPlayer::ChagneGhost(UClass* ghost) {
 		GhostMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
-
+void SnapToRest(USnapPoint* snapP) 
+{
+	Ghost->SetActorLocation((snapP->GetForwardVector() * 100) + snapP->GetOwner()->GetActorLocation());
+}
 void AMainCameraPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -82,7 +85,7 @@ void AMainCameraPlayer::Tick(float DeltaTime)
 		GEngine->AddOnScreenDebugMessage(GameMode->SnapPoints.Find(snapP), 5, FColor::Cyan, FString::SanitizeFloat(FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation())));
 		if (FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation())<DistanceToSnap)
 		{
-
+			SnapToRest(snapP);
 			break;
 		}
 	}

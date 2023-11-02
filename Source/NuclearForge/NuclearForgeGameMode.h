@@ -20,6 +20,8 @@ class NUCLEARFORGE_API ANuclearForgeGameMode : public AGameModeBase
 	TArray<USnapPoint*>SnapPoints;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
 	AMainCameraPlayer* Player;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite);
+	USceneComponent* forward;
 	UFUNCTION(BlueprintCallable)
 	void AddSnappingPoint(USnapPoint * snapPoint);
 };
