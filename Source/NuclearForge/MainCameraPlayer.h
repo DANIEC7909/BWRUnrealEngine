@@ -26,6 +26,8 @@ public:
 	UPROPERTY(EditAnywhere);
 	float Speed=100;
 	UPROPERTY(EditAnywhere);
+	float DistanceToSnap = 70;
+	UPROPERTY(EditAnywhere);
 	float UpDownSpeed = 50;
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UPROPERTY(EditAnywhere, Category = "Testing")

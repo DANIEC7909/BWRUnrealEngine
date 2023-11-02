@@ -3,3 +3,7 @@
 
 #include "NuclearForgeGameMode.h"
 
+void ANuclearForgeGameMode::AddSnappingPoint(USnapPoint* snapPoint)
+{
+	SnapPoints.Add(snapPoint);
+}
