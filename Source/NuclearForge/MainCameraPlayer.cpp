@@ -65,7 +65,7 @@ void AMainCameraPlayer::Tick(float DeltaTime)
 			if (Ghost != nullptr)
 			{
 				
-				Ghost->SetActorLocation(FVector(FMath::FloorToInt(SurfacePoint.X), FMath::FloorToInt(SurfacePoint.Y), FMath::FloorToInt(SurfacePoint.Z)));
+				Ghost->SetActorLocation(AMainCameraPlayer::SnapPosition(SurfacePoint)); // (FVector(FMath::FloorToInt(SurfacePoint.X), FMath::FloorToInt(SurfacePoint.Y), FMath::FloorToInt(SurfacePoint.Z)));
 				if (!HitResult.GetActor()->ActorHasTag("TestCube"))
 				{
 					GhostMesh->SetMaterial(0, CanBeBuiltMaterial);

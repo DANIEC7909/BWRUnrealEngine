@@ -19,23 +19,56 @@ public:
 	void MoveUpDown(float value);
 	void PlaceObject();
 	void ChagneGhost(UClass* ghost);
+	
 	UPROPERTY(EditAnywhere, Category = "GhostMESH");
 	UMaterialInterface* CanBeBuiltMaterial;
 	UPROPERTY(EditAnywhere, Category = "GhostMESH");
 	UMaterialInterface* CannotBeBuiltMaterial;
+	
 	UPROPERTY(EditAnywhere);
+	/// <summary>
+	/// Movement Speed of "Camera Player"
+	/// </summary>
 	float Speed=100;
 	UPROPERTY(EditAnywhere);
+	/// <summary>
+	/// This is Distance to snap one block to another
+	/// </summary>
 	float DistanceToSnap = 70;
 	UPROPERTY(EditAnywhere);
+	/// <summary>
+	/// This is multiplier of Z movement distance.
+	/// </summary>
 	float UpDownSpeed = 50;
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere);
+	/// <summary>
+	/// This is grid size of blocks snapping
+	/// </summary>
+	float GridSize = 100;
+	
 	UPROPERTY(EditAnywhere, Category = "Blocks")
+	/// <summary>
+	/// This is Actor That represents blocks.
+	/// </summary>
 	TSubclassOf<AActor> ActorToSpawn;
+	
 	UPROPERTY(EditAnywhere, Category = "Blocks ghosts")
+	/// <summary>
+	/// Ghost block to spawn. I gonna rework this because, it's should use ActorToSpawn and should cut all functionalities then just use GFX.
+	/// </summary>
 	TSubclassOf<AActor> GhostToSpawn;
+	
 	FHitResult HitResult;
 	FVector SurfacePoint;
+	
+	UFUNCTION()
+	FVector SnapPosition(FVector& pos) {
+		FVector position;
+		position.X = FMath::Floor(pos.X / GridSize) * GridSize;
+		position.Y = FMath::Floor(pos.Y / GridSize) * GridSize;
+		position.Z = pos.Z;//FMath::Floor(pos.Z / 100.0f) * 100.0f;
+		return position;
+	}
 protected:
 	virtual void BeginPlay() override;
 
