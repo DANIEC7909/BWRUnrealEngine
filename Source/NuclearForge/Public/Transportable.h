@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SnapPoint.h"
 #include "GameFramework/Actor.h"
 #include "Transportable.generated.h"
 
@@ -16,16 +17,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Amount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int PresureDrop;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Pressure;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int ProductTemperature;
+	int Temperature;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int TemperatureDrop;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ATransportable* Outlet;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USnapPoint* OutletSnapPoint;
 protected:
 
 
 public:	
-	
+	void TransportProduct();
 
 };

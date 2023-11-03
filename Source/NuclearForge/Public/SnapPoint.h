@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Transportable.h"
 #include "Components/SceneComponent.h"
 #include "SnapPoint.generated.h"
 
@@ -18,7 +17,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsOutlet;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ATransportable* Parent;
+	class ATransportable* Parent;
 protected:
 	virtual void BeginPlay() override;
 };

@@ -111,7 +111,7 @@ void AMainCameraPlayer::PlaceObject()
 	if (!HitResult.GetActor()->ActorHasTag("Block") && Ghost != nullptr)
 	{
 		AMainCameraPlayer::LastPlacedBlock = GetWorld()->SpawnActor<AActor>(Blocks[AMainCameraPlayer::BlockID], Ghost->GetActorLocation(), FRotator::ZeroRotator);
-
+		GameMode->PlacedBlocks.Add(AMainCameraPlayer::LastPlacedBlock);
 		AMainCameraPlayer::ConnectIfPossible(AMainCameraPlayer::LastPlacedBlock);
 
 	}
@@ -133,7 +133,7 @@ void  AMainCameraPlayer::ConnectIfPossible(AActor* SpawnedActor)
 
 		for (USnapPoint* snapP : GameMode->SnapPoints) {
 			//GEngine->AddOnScreenDebugMessage(GameMode->SnapPoints.Find(snapP), 5, FColor::Cyan, FString::SanitizeFloat(FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation())));
-			if (FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation()) < DistanceToSnap&& snapP->IsOutlet && snapP->Parent!=spawnedBlock)
+			if (FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation()) < DistanceToSnap && snapP->IsOutlet && snapP->Parent != spawnedBlock)
 			{
 				nearBlock = Cast<ATransportable>(snapP->GetOwner());
 				break;
@@ -144,14 +144,27 @@ void  AMainCameraPlayer::ConnectIfPossible(AActor* SpawnedActor)
 			UE_LOG(LogTemp, Warning, TEXT("We cannot find any ner blocks to connect or cast failed."));
 			return;
 		}
-		
+
+		//Connect backward.
+		for (auto& Block : GameMode->PlacedBlocks)
+		{
+			if (Block->IsA(ATransportable::StaticClass()) && Block != spawnedBlock)
+			{
+				if (FVector::Distance(spawnedBlock->OutletSnapPoint->GetComponentLocation(), Block->GetActorLocation()) < DistanceToSnap)
+				{
+					spawnedBlock->Outlet = Cast<ATransportable>(Block);
+					GEngine->AddOnScreenDebugMessage(24, 5, FColor::Cyan, TEXT("Connected Backward"));
+				}
+			}
+		}
 		if (nearBlock != spawnedBlock)
 		{
 			nearBlock->Outlet = spawnedBlock;
+
 			GEngine->AddOnScreenDebugMessage(24, 5, FColor::Magenta, TEXT("Let's connect me up!"));
 		}
-	}
 
+	}
 }
 void AMainCameraPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

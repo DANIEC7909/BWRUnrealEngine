@@ -11,4 +11,8 @@ PrimaryActorTick.bCanEverTick = true;
 
 }
 
+void ATransportable::TransportProduct()
+{
+}
+
 
