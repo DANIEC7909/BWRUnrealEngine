@@ -13,6 +13,17 @@ PrimaryActorTick.bCanEverTick = true;
 
 void ATransportable::TransportProduct()
 {
+    if (Outlet!=nullptr) {
+        if (CurrentTransportTime > TransportationTreshold)
+        {
+            if (Amount > 0)
+            {
+                Amount--;
+                Outlet->Amount++;
+            }
+            CurrentTransportTime = 0;
+        }
+    }
 }
 
 

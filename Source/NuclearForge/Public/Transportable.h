@@ -15,6 +15,11 @@ class NUCLEARFORGE_API ATransportable : public AActor
 public:	
 	ATransportable();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TransportationTreshold;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurrentTransportTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Amount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int PresureDrop;
