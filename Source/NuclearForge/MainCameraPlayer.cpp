@@ -4,15 +4,12 @@
 #include "MainCameraPlayer.h"
 #include <Kismet/GameplayStatics.h>
 #include "NuclearForgeGameMode.h"
+#include "Transportable.h"
 AMainCameraPlayer::AMainCameraPlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 }
-float cachedSpeed;
-AActor* Ghost;
-UStaticMeshComponent* GhostMesh;
-APlayerController* PlayerController;
-ANuclearForgeGameMode* GameMode;
+
 void AMainCameraPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -34,10 +31,10 @@ void AMainCameraPlayer::ChagneGhost(UClass* ghost) {
 		GhostMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
-void SnapToRest(USnapPoint* snapP)
-{
-	Ghost->SetActorLocation((snapP->GetForwardVector() * 100) + snapP->GetOwner()->GetActorLocation());
-}
+//void SnapToRest(USnapPoint* snapP)
+//{
+//	Ghost->SetActorLocation((snapP->GetForwardVector() * 100) + snapP->GetOwner()->GetActorLocation());
+//}
 void AMainCameraPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -64,7 +61,7 @@ void AMainCameraPlayer::Tick(float DeltaTime)
 			{
 
 				Ghost->SetActorLocation(AMainCameraPlayer::SnapPosition(SurfacePoint)); // (FVector(FMath::FloorToInt(SurfacePoint.X), FMath::FloorToInt(SurfacePoint.Y), FMath::FloorToInt(SurfacePoint.Z)));
-				if (!HitResult.GetActor()->ActorHasTag("TestCube"))
+				if (!HitResult.GetActor()->ActorHasTag("Block"))
 				{
 					GhostMesh->SetMaterial(0, CanBeBuiltMaterial);
 				}
@@ -79,14 +76,15 @@ void AMainCameraPlayer::Tick(float DeltaTime)
 
 	//in future i have to rewirte this to be more performant.
 #pragma region SampleAllSnapPoints
-	for (USnapPoint* snapP : GameMode->SnapPoints) {
-		//GEngine->AddOnScreenDebugMessage(GameMode->SnapPoints.Find(snapP), 5, FColor::Cyan, FString::SanitizeFloat(FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation())));
-		if (FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation()) < DistanceToSnap)
-		{
-			SnapToRest(snapP);
-			break;
-		}
-	}
+	//for (USnapPoint* snapP : GameMode->SnapPoints) {
+	//	//GEngine->AddOnScreenDebugMessage(GameMode->SnapPoints.Find(snapP), 5, FColor::Cyan, FString::SanitizeFloat(FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation())));
+	//	if (FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation()) < DistanceToSnap)
+	//	{
+	//		NearestSnapPoint = snapP;
+	//		//SnapToRest(snapP);
+	//		break;
+	//	}
+	//}
 #pragma endregion
 }
 #pragma region Movement
@@ -110,12 +108,51 @@ void AMainCameraPlayer::MoveUpDown(float value)
 #pragma endregion
 void AMainCameraPlayer::PlaceObject()
 {
-	if (!HitResult.GetActor()->ActorHasTag("TestCube") && Ghost != nullptr)
+	if (!HitResult.GetActor()->ActorHasTag("Block") && Ghost != nullptr)
 	{
-		GetWorld()->SpawnActor<AActor>(Blocks[AMainCameraPlayer::BlockID], Ghost->GetActorLocation(), FRotator::ZeroRotator);
+		AMainCameraPlayer::LastPlacedBlock = GetWorld()->SpawnActor<AActor>(Blocks[AMainCameraPlayer::BlockID], Ghost->GetActorLocation(), FRotator::ZeroRotator);
+
+		AMainCameraPlayer::ConnectIfPossible(AMainCameraPlayer::LastPlacedBlock);
+
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(99, 5, FColor::Cyan, TEXT("ACTOR cannot be placed here"));
 	}
 }
+void  AMainCameraPlayer::ConnectIfPossible(AActor* SpawnedActor)
+{
+	GEngine->AddOnScreenDebugMessage(98, 5, FColor::Yellow, TEXT("I can be connected!"));
 
+	if (SpawnedActor->IsA(ATransportable::StaticClass()))
+	{
+		GEngine->AddOnScreenDebugMessage(34, 5, FColor::Magenta, TEXT("I'm Transportable!"));
+
+		ATransportable* nearBlock = nullptr;
+		ATransportable* spawnedBlock = Cast<ATransportable>(SpawnedActor);
+
+		for (USnapPoint* snapP : GameMode->SnapPoints) {
+			//GEngine->AddOnScreenDebugMessage(GameMode->SnapPoints.Find(snapP), 5, FColor::Cyan, FString::SanitizeFloat(FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation())));
+			if (FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation()) < DistanceToSnap&& snapP->IsOutlet && snapP->Parent!=spawnedBlock)
+			{
+				nearBlock = Cast<ATransportable>(snapP->GetOwner());
+				break;
+			}
+		}
+
+		if (nearBlock == nullptr) {
+			UE_LOG(LogTemp, Warning, TEXT("We cannot find any ner blocks to connect or cast failed."));
+			return;
+		}
+		
+		if (nearBlock != spawnedBlock)
+		{
+			nearBlock->Outlet = spawnedBlock;
+			GEngine->AddOnScreenDebugMessage(24, 5, FColor::Magenta, TEXT("Let's connect me up!"));
+		}
+	}
+
+}
 void AMainCameraPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

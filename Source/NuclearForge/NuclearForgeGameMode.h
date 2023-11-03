@@ -8,9 +8,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "NuclearForgeGameMode.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class NUCLEARFORGE_API ANuclearForgeGameMode : public AGameModeBase
 {
@@ -21,7 +19,8 @@ class NUCLEARFORGE_API ANuclearForgeGameMode : public AGameModeBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
 	AMainCameraPlayer* Player;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
-	USceneComponent* forward;
+	TArray<AActor*>PlacedBlocks;
+
 	UFUNCTION(BlueprintCallable)
 	void AddSnappingPoint(USnapPoint * snapPoint);
 };

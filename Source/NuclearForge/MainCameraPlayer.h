@@ -13,23 +13,18 @@ class NUCLEARFORGE_API AMainCameraPlayer : public APawn
 
 public:
 	AMainCameraPlayer();
-	void MovementForward(float AxisValue);
-	void MovementSide(float AxisValue);
-	void IncreseSpeed(float value);
-	void MoveUpDown(float value);
-	void PlaceObject();
-	void ChagneGhost(UClass* ghost);
-	
+
+
 	UPROPERTY(EditAnywhere, Category = "GhostMESH");
 	UMaterialInterface* CanBeBuiltMaterial;
 	UPROPERTY(EditAnywhere, Category = "GhostMESH");
 	UMaterialInterface* CannotBeBuiltMaterial;
-	
+
 	UPROPERTY(EditAnywhere);
 	/// <summary>
 	/// Movement Speed of "Camera Player"
 	/// </summary>
-	float Speed=100;
+	float Speed = 100;
 	UPROPERTY(EditAnywhere);
 	/// <summary>
 	/// This is Distance to snap one block to another
@@ -47,22 +42,40 @@ public:
 	float GridSize = 100;
 
 	UPROPERTY(EditAnywhere, Category = "Blocks")
-	uint32 BlockID=0;
+	uint32 BlockID = 0;
 	UPROPERTY(EditAnywhere, Category = "Blocks")
 	/// <summary>
 	/// This is Actor That represents blocks.
 	/// </summary>
 	TArray<TSubclassOf<AActor>> Blocks;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Blocks ghosts")
 	/// <summary>
 	/// Ghost block to spawn. I gonna rework this because, it's should use ActorToSpawn and should cut all functionalities then just use GFX.
 	/// </summary>
 	TSubclassOf<AActor> GhostToSpawn;
-	
+
 	FHitResult HitResult;
 	FVector SurfacePoint;
-	
+	float cachedSpeed;
+	AActor* Ghost;
+	UStaticMeshComponent* GhostMesh;
+	APlayerController* PlayerController;
+	class ANuclearForgeGameMode* GameMode;
+	AActor* LastPlacedBlock;
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	virtual void Tick(float DeltaTime) override;
+	void MovementForward(float AxisValue);
+	void MovementSide(float AxisValue);
+	void IncreseSpeed(float value);
+	void MoveUpDown(float value);
+	void PlaceObject();
+	void ConnectIfPossible(AActor* actor);
+	void ChagneGhost(UClass* ghost);
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION()
 	FVector SnapPosition(FVector& pos) {
 		FVector position;
@@ -71,12 +84,5 @@ public:
 		position.Z = pos.Z;//FMath::Floor(pos.Z / 100.0f) * 100.0f;
 		return position;
 	}
-protected:
-	virtual void BeginPlay() override;
-
-public:	
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };

@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Transportable.h"
 #include "Components/SceneComponent.h"
 #include "SnapPoint.generated.h"
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class NUCLEARFORGE_API USnapPoint : public USceneComponent
@@ -15,14 +15,10 @@ class NUCLEARFORGE_API USnapPoint : public USceneComponent
 public:	
 	// Sets default values for this component's properties
 	USnapPoint();
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsOutlet;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ATransportable* Parent;
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
 };
