@@ -55,14 +55,26 @@ public:
 	/// </summary>
 	TSubclassOf<AActor> GhostToSpawn;
 
+	UPROPERTY(EditAnywhere)
 	FHitResult HitResult;
+	UPROPERTY(EditAnywhere)
 	FVector SurfacePoint;
+	UPROPERTY(EditAnywhere)
 	float cachedSpeed;
+	UPROPERTY(EditAnywhere)
 	AActor* Ghost;
+	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* GhostMesh;
+	UPROPERTY(EditAnywhere)
 	APlayerController* PlayerController;
+	UPROPERTY(EditAnywhere)
 	class ANuclearForgeGameMode* GameMode;
+	UPROPERTY(EditAnywhere)
 	AActor* LastPlacedBlock;
+	UPROPERTY(EditAnywhere)
+	float DeltaTime;
+	UPROPERTY(EditAnywhere)
+	float CameraPanSpeed= 20;
 protected:
 	virtual void BeginPlay() override;
 
@@ -70,6 +82,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void MovementForward(float AxisValue);
 	void MovementSide(float AxisValue);
+	void CameraPan(float axis);
 	void IncreseSpeed(float value);
 	void MoveUpDown(float value);
 	void PlaceObject();

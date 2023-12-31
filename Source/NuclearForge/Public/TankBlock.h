@@ -4,22 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "Transportable.h"
-#include "PipeBlock.generated.h"
+#include "TankBlock.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class NUCLEARFORGE_API APipeBlock : public ATransportable
+class NUCLEARFORGE_API ATankBlock : public ATransportable
 {
 	GENERATED_BODY()
 public:
-	APipeBlock();
+	ATankBlock();
 private:
 	virtual void BeginPlay() override;
-//	virtual void OnConstruction() override;
+	//	virtual void OnConstruction() override;
 public:
 	virtual void Tick(float DeltaTime) override;
-
 
 };

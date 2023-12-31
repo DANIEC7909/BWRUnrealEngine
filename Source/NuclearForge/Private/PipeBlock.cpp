@@ -11,13 +11,20 @@ APipeBlock::APipeBlock()
 void APipeBlock::BeginPlay()
 {
 	Super::BeginPlay();
+	GEngine->AddOnScreenDebugMessage(53, 10, FColor::Blue ,FString(ActorInstanceGuid.ToString()));
 
 }
+
+//void APipeBlock::OnConstruction()
+//{
+//	GEngine->AddOnScreenDebugMessage(0, 10, FColor::Emerald, TEXT("oncost"));
+//
+//}
 
 void APipeBlock::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 200), FString::FromInt(Amount));
-	CurrentTransportTime += DeltaTime;
-	TransportProduct();
+	
+	TransportProduct(DeltaTime);
 }

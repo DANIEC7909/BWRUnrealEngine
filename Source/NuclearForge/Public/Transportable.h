@@ -20,23 +20,27 @@ public:
 	float CurrentTransportTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Amount;
+	int32 Amount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int PresureDrop;
+	int32 TransportAmount=5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Pressure;
+	int32 PresureDrop;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Temperature;
+	int32 Pressure;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int TemperatureDrop;
+	int32 Temperature;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TemperatureDrop;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ATransportable* Outlet;
+	UPROPERTY(EditAnywhere)
+	FComponentReference USnapPointReference;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USnapPoint* OutletSnapPoint;
 protected:
 
 
 public:	
-	void TransportProduct();
-
+	void TransportProduct(float DeltaTime);
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

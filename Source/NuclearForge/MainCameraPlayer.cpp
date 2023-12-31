@@ -30,19 +30,20 @@ void AMainCameraPlayer::ChagneGhost(UClass* ghost) {
 		GhostMesh = Ghost->GetComponentByClass<UStaticMeshComponent>();
 		GhostMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+
 }
 //void SnapToRest(USnapPoint* snapP)
 //{
 //	Ghost->SetActorLocation((snapP->GetForwardVector() * 100) + snapP->GetOwner()->GetActorLocation());
 //}
-void AMainCameraPlayer::Tick(float DeltaTime)
+void AMainCameraPlayer::Tick(float _DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(_DeltaTime);
 #pragma region CursorPositionSelection
 	double ViewportSizeX, ViewportSizeY;
 	PlayerController->GetMousePosition(ViewportSizeX, ViewportSizeY);
 	auto ScreenLocation = FVector2D(ViewportSizeX, ViewportSizeY);
-
+	DeltaTime = _DeltaTime;
 	FVector WorldLocation;
 	FVector WorldDirection;
 	if (PlayerController->DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, WorldLocation, WorldDirection))
@@ -71,7 +72,15 @@ void AMainCameraPlayer::Tick(float DeltaTime)
 				}
 			}
 		}
+	}if (GameMode->PlacedBlocks.Num() > 0 && IsValid(GameMode->PlacedBlocks[0]))
+	{
+		FVector vec = GameMode->PlacedBlocks[0]->GetActorLocation() - Ghost->GetActorLocation();
+		vec.Normalize();
+		GEngine->AddOnScreenDebugMessage(25, 5, FColor::Emerald,vec.ToString());
+	
 	}
+
+
 #pragma endregion
 
 	//in future i have to rewirte this to be more performant.
@@ -90,11 +99,15 @@ void AMainCameraPlayer::Tick(float DeltaTime)
 #pragma region Movement
 void AMainCameraPlayer::MovementForward(float AxisValue)
 {
-	SetActorLocation(FVector(AxisValue * Speed + GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z));
+	SetActorLocation(GetActorLocation() + GetActorForwardVector() * AxisValue * Speed);
 }
 void AMainCameraPlayer::MovementSide(float AxisValue)
 {
-	SetActorLocation(FVector(GetActorLocation().X, AxisValue * Speed + GetActorLocation().Y, GetActorLocation().Z));
+	SetActorLocation(GetActorLocation() + GetActorRightVector()* AxisValue * Speed );
+}
+void AMainCameraPlayer::CameraPan(float axis)
+{
+	AddActorLocalRotation(FRotator(0, ((AMainCameraPlayer::CameraPanSpeed*axis)*DeltaTime), 0));
 }
 
 void AMainCameraPlayer::IncreseSpeed(float value)
@@ -120,6 +133,8 @@ void AMainCameraPlayer::PlaceObject()
 		GEngine->AddOnScreenDebugMessage(99, 5, FColor::Cyan, TEXT("ACTOR cannot be placed here"));
 	}
 }
+ATransportable* nearBlock = nullptr;
+ATransportable* spawnedBlock = nullptr;
 void  AMainCameraPlayer::ConnectIfPossible(AActor* SpawnedActor)
 {
 	GEngine->AddOnScreenDebugMessage(98, 5, FColor::Yellow, TEXT("I can be connected!"));
@@ -128,11 +143,11 @@ void  AMainCameraPlayer::ConnectIfPossible(AActor* SpawnedActor)
 	{
 		GEngine->AddOnScreenDebugMessage(34, 5, FColor::Magenta, TEXT("I'm Transportable!"));
 
-		ATransportable* nearBlock = nullptr;
-		ATransportable* spawnedBlock = Cast<ATransportable>(SpawnedActor);
+		
+		spawnedBlock = Cast<ATransportable>(SpawnedActor);
 
-		for (USnapPoint* snapP : GameMode->SnapPoints) {
-			//GEngine->AddOnScreenDebugMessage(GameMode->SnapPoints.Find(snapP), 5, FColor::Cyan, FString::SanitizeFloat(FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation())));
+		for (USnapPoint* snapP : GameMode->SnapPoints)
+		{
 			if (FVector::Distance(snapP->GetComponentLocation(), Ghost->GetActorLocation()) < DistanceToSnap && snapP->IsOutlet && snapP->Parent != spawnedBlock)
 			{
 				nearBlock = Cast<ATransportable>(snapP->GetOwner());
@@ -145,26 +160,27 @@ void  AMainCameraPlayer::ConnectIfPossible(AActor* SpawnedActor)
 			return;
 		}
 
-		//Connect backward.
-		for (auto& Block : GameMode->PlacedBlocks)
-		{
-			if (Block->IsA(ATransportable::StaticClass()) && Block != spawnedBlock)
-			{
-				if (FVector::Distance(spawnedBlock->OutletSnapPoint->GetComponentLocation(), Block->GetActorLocation()) < DistanceToSnap)
-				{
-					spawnedBlock->Outlet = Cast<ATransportable>(Block);
-					GEngine->AddOnScreenDebugMessage(24, 5, FColor::Cyan, TEXT("Connected Backward"));
-				}
-			}
-		}
+	
 		if (nearBlock != spawnedBlock)
 		{
-			nearBlock->Outlet = spawnedBlock;
+			FVector vec = nearBlock->GetActorLocation() - spawnedBlock->GetActorLocation();
+			vec.Normalize();
+			if (vec.X > 0)
+			{
+				spawnedBlock->Outlet= nearBlock;
+				GEngine->AddOnScreenDebugMessage(25, 5, FColor::Blue, TEXT("Connected Forward"));
+			}
+			else if (vec.X < 0)
+			{
+				nearBlock->Outlet = spawnedBlock;
+				GEngine->AddOnScreenDebugMessage(24, 5, FColor::Cyan, TEXT("Connected Backward"));
+			}
 
-			GEngine->AddOnScreenDebugMessage(24, 5, FColor::Magenta, TEXT("Let's connect me up!"));
 		}
 
 	}
+	spawnedBlock = nullptr;
+	nearBlock = nullptr;
 }
 void AMainCameraPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -174,6 +190,7 @@ void AMainCameraPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("MoveSide", this, &AMainCameraPlayer::MovementSide);
 	PlayerInputComponent->BindAxis("IncreseSpeed", this, &AMainCameraPlayer::IncreseSpeed);
 	PlayerInputComponent->BindAxis("MoveUpDown", this, &AMainCameraPlayer::MoveUpDown);
+	PlayerInputComponent->BindAxis("CameraPan", this, &AMainCameraPlayer::CameraPan);
 
 	//Actions
 	PlayerInputComponent->BindAction("PlaceObject", IE_Pressed, this, &AMainCameraPlayer::PlaceObject);
